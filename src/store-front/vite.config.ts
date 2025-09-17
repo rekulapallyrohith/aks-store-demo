@@ -78,6 +78,7 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
       })
     }
   }
+
   return {
     plugins: [
       vue(),
@@ -92,7 +93,7 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
     },
     server: {
       port: 8080,
-      open: true,
+      open: false,   // ✅ stop Vite from auto-opening browser
       host: '0.0.0.0',
       cors: true,
       strictPort: true,

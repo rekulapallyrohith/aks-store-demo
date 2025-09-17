@@ -2,32 +2,33 @@ import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
   testDir: './e2e',
-  testMatch: ['**/e2e/**/*.spec.ts', '**/traffic/**/*.spec.ts'],
   fullyParallel: true,
-  forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : undefined,
   reporter: 'html',
-
   use: {
     headless: true,
-    baseURL: 'http://127.0.0.1:8080', // ✅ safer than localhost in CI
+    baseURL: 'http://localhost:8080',
     trace: 'on-first-retry',
-    video: 'retain-on-failure',
-    screenshot: 'on',
   },
-
   projects: [
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
     },
+    {
+      name: 'firefox',
+      use: { ...devices['Desktop Firefox'] },
+    },
+    {
+      name: 'webkit',
+      use: { ...devices['Desktop Safari'] },
+    },
   ],
 
+  // 👇 This tells Playwright to start your app automatically
   webServer: {
-    command: 'npm run preview -- --port 8080 --host 127.0.0.1',
-    url: 'http://127.0.0.1:8080',   // ✅ wait for this exact URL
-    timeout: 180 * 1000,
-    reuseExistingServer: !process.env.CI,
+    command: 'npm run dev',
+    url: 'http://localhost:8080',
+    reuseExistingServer: !process.env.CI, // re-use server if already running locally
+    timeout: 60 * 1000, // wait up to 60s
   },
 });
