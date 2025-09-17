@@ -33,25 +33,24 @@ jobs:
         run: npm run test:unit -- --run
         working-directory: src/store-front
 
+      # Build app BEFORE Playwright preview server
+      - name: Build app
+        run: npm run build
+        working-directory: src/store-front
+
       # Install Playwright browsers
       - name: Install Playwright
         run: npx playwright install --with-deps
         working-directory: src/store-front
 
-      # Build the app before E2E
-      - name: Build app
-        run: npm run build
-        working-directory: src/store-front
-
-      # Run e2e tests against preview server
+      # Run e2e tests with preview server
       - name: Run e2e tests
-        run: |
-          npx playwright test --reporter=line
+        run: npx playwright test --reporter=line
         working-directory: src/store-front
         env:
           CI: true
 
-      # Upload dist as artifact
+      # Upload dist as artifact (after tests)
       - name: Upload production-ready build
         uses: actions/upload-artifact@v4
         with:
