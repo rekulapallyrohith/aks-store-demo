@@ -25,30 +25,22 @@ jobs:
         run: npm run type-check
         working-directory: src/store-front
 
-      # Run unit tests
+      # Run unit tests (skip gracefully if none)
       - name: Run unit tests
         run: npm run test:unit -- --run || echo "⚠️ No unit tests found, skipping"
         working-directory: src/store-front
 
-      - name: Debug preview server
-        run: |
-          npm run build
-          nohup npm run preview -- --port 8080 --host 0.0.0.0 > preview.log 2>&1 &
-          sleep 10
-          curl -v http://127.0.0.1:8080/health || true
+      # Build app before e2e tests
+      - name: Build app
+        run: npm run build
         working-directory: src/store-front
 
       # Install Playwright browsers
       - name: Install Playwright
-        run: npx playwright install chromium
+        run: npx playwright install --with-deps
         working-directory: src/store-front
 
-      # Build app before running preview server
-      - name: Build app for e2e
-        run: npm run build
-        working-directory: src/store-front
-
-      # Run e2e tests with Playwright (using preview server)
+      # Run e2e tests (Playwright will start/stop preview automatically)
       - name: Run e2e tests
         run: npx playwright test --reporter=line
         working-directory: src/store-front
