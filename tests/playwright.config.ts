@@ -6,8 +6,10 @@ export default defineConfig({
   reporter: 'html',
   use: {
     headless: true,
-    baseURL: 'http://localhost:8080',
+    baseURL: 'http://127.0.0.1:8080', // use 127.0.0.1 for CI reliability
     trace: 'on-first-retry',
+    video: 'retain-on-failure',
+    screenshot: 'on',
   },
   projects: [
     {
@@ -24,11 +26,11 @@ export default defineConfig({
     },
   ],
 
-  // 👇 This tells Playwright to start your app automatically
+  // Use preview server for CI
   webServer: {
-    command: 'npm run dev',
-    url: 'http://localhost:8080',
-    reuseExistingServer: !process.env.CI, // re-use server if already running locally
-    timeout: 60 * 1000, // wait up to 60s
+    command: 'npm run preview -- --port 8080 --host 127.0.0.1',
+    url: 'http://127.0.0.1:8080',
+    reuseExistingServer: !process.env.CI,
+    timeout: 180 * 1000, // allow 3 minutes for safety in GitHub Actions
   },
 });

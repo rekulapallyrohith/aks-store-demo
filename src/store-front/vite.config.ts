@@ -80,12 +80,13 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
   }
 
   return {
-    plugins: [
+        plugins: [
       vue(),
       vueJsx(),
       vueDevTools(),
-      middlewarePlugin,
+      ...(mode !== 'production' ? [middlewarePlugin] : []), // only enable middleware in dev/test
     ],
+
     resolve: {
       alias: {
         '@': fileURLToPath(new URL('./src', import.meta.url))
