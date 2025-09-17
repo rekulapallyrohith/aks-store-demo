@@ -28,9 +28,10 @@ export default defineConfig({
 
   // Use preview server for CI
   webServer: {
-    command: 'npm run preview -- --port 8080 --host 127.0.0.1',
-    url: 'http://127.0.0.1:8080',
-    reuseExistingServer: !process.env.CI,
-    timeout: 180 * 1000, // allow 3 minutes for safety in GitHub Actions
-  },
+  command: 'npm run preview',
+  url: 'http://127.0.0.1:8080',
+  reuseExistingServer: !process.env.CI,
+  timeout: 180_000,
+},
+
 });
