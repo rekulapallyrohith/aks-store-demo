@@ -29,10 +29,14 @@ jobs:
       - name: Run unit tests
         run: npm run test:unit -- --run || echo "⚠️ No unit tests found, skipping"
         working-directory: src/store-front
-        env:
-          VITE_PRODUCT_SERVICE_URL: http://localhost:3002/
-          VITE_ORDER_SERVICE_URL: http://localhost:3000/
 
+      - name: Debug preview server
+        run: |
+          npm run build
+          nohup npm run preview -- --port 8080 --host 0.0.0.0 > preview.log 2>&1 &
+          sleep 10
+          curl -v http://127.0.0.1:8080/health || true
+        working-directory: src/store-front
 
       # Install Playwright browsers
       - name: Install Playwright
