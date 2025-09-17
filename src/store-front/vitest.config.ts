@@ -1,13 +1,10 @@
-import { defineConfig, mergeConfig } from 'vitest/config'
-import type { UserConfig } from 'vite'
-import baseViteConfig from './vite.config'
+import { defineConfig } from 'vitest/config'
+import vue from '@vitejs/plugin-vue'
 
-const vitestConfig: UserConfig = defineConfig({
+export default defineConfig({
+  plugins: [vue()],
   test: {
     environment: 'jsdom',
     exclude: ['e2e/**', 'node_modules/**'],
-    globals: true
   }
 })
-
-export default mergeConfig(baseViteConfig, vitestConfig)
