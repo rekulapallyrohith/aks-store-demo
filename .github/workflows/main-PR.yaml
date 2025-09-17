@@ -18,11 +18,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 18
-          cache: 'npm'
-      
-      - name: adding a lock file
-        run: npm install --package-lock-only
-        working-directory: src/store-front
 
       - name: Install dependencies
         run: npm ci
