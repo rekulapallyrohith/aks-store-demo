@@ -44,9 +44,10 @@ export default defineConfig({
 
   /* Run your preview server before starting the tests */
   webServer: {
-    command: 'npm run preview -- --port 8080 --host 0.0.0.0',
-    port: 8080,
-    timeout: 120 * 1000, // give CI 2 minutes
-    reuseExistingServer: !process.env.CI,
-  },
+  command: 'npm run preview -- --port 8080 --host 0.0.0.0',
+  port: 8080,
+  timeout: 180 * 1000, // 3 minutes, safer for GitHub Actions
+  reuseExistingServer: !process.env.CI,
+},
+
 });
