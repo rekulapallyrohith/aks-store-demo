@@ -16,7 +16,7 @@ jobs:
         run: npm run build
         working-directory: src/store-front
       - name: testing the build
-        run: npm run test 
+        run: npm test 
         working-directory: src/store-front
       - name: zip build output
         run: zip -r dist.zip src/store-front/dist/
