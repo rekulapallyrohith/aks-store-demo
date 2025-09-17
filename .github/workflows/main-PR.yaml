@@ -1,0 +1,24 @@
+name: aks-store-build
+on: 
+  pull_request:
+    branch:
+      - main
+  workflow_dispatch:
+jobs:
+  store-front:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: install dependencies
+        run: npm install
+      - name: build the packages
+        run: npm run build
+        working_directory: src/store-front
+      - name: zip build output
+        run: zip -r dist.zip src/store-front/dist/
+      - name: upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifact
+          path: dist.zip
