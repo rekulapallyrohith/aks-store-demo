@@ -11,8 +11,10 @@ jobs:
         uses: actions/checkout@v2
       - name: install dependencies
         run: npm install
+        working-directory: src/store-front
       - name: build the packages
         run: npm run build
+        working-directory: src/store-front
       - name: zip build output
         run: zip -r dist.zip src/store-front/dist/
       - name: upload artifacts
