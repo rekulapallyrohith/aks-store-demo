@@ -15,12 +15,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Setup Node.js
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
-
       # Install dependencies
       - name: Install dependencies
         run: npm ci
@@ -38,7 +32,7 @@ jobs:
 
       # Install Playwright browsers
       - name: Install Playwright
-        run: npx playwright install --with-deps
+        run: npx playwright install chromium
         working-directory: src/store-front
 
       # Build app before running preview server
