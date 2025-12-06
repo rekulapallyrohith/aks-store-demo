@@ -60,7 +60,7 @@ jobs:
               run: |
                 cd infra/terraform
                 terraform init
-                teraaform apply --auto-approve
+                terraform apply --auto-approve
             - name: deploy in kubernets
               run: |
                 kubectl apply -f aks-store-all-in-one.yaml
