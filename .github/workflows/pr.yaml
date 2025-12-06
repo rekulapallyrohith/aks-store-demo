@@ -1,0 +1,55 @@
+name: "pull request workflow"
+
+on:
+    pull_request:
+        branches:
+            - developer/v1.0
+    workflow_dispatch:
+jobs:
+    pr-job:
+        runs-on: self-hosted
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v5
+            - name: Install Trivy
+              uses: aquasecurity/setup-trivy@v0.2.3
+              with:
+                  version: v0.61.0
+                  cache: true
+            - name: Build order service
+              uses: docker/build-push-action@v6
+              with:
+                  context: ./src/order-service
+                  load: true
+                  tags: order-service:test
+            - name: Run Trivy vulnerability scanner
+              uses: aquasecurity/trivy-action@0.28.0
+              with:
+                image-ref: order-service:test
+                format: 'sarif'
+                output: 'trivy-results.sarif'
+            - name: Build product service
+              uses: docker/build-push-action@v6
+              with:
+                  context: ./src/product-service
+                  load: true
+                  tags: product-service:test
+            - name: Run Trivy vulnerability scanner
+              uses: aquasecurity/trivy-action@0.28.0
+              with:
+                image-ref: product-service:test
+                format: 'sarif'
+                output: 'trivy-results.sarif'
+            - name: Build store-front service
+              uses: docker/build-push-action@v6
+              with:
+                  context: ./src/store-front
+                  load: true
+                  tags: store-front-service:test
+            
+            - name: Run Trivy vulnerability scanner
+              uses: aquasecurity/trivy-action@0.28.0
+              with:
+                image-ref: store-front-service:test
+                format: 'sarif'
+                output: 'trivy-results.sarif'
