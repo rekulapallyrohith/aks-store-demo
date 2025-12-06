@@ -1,0 +1,58 @@
+name: "developer workflow"
+
+on:
+    push: 
+        branches:
+            - developer/v1.0
+    workflow_dispatch:
+jobs:
+    dev-CI:
+        runs-on: self-hosted
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v5
+            - name: Install Trivy
+              uses: aquasecurity/setup-trivy@v0.2.3
+              with:
+                  version: v0.61.0
+                  cache: true
+            - name: Build and push order service images to Docker
+              uses: docker/build-push-action@v6
+              with:
+                  context: ./src/order-service
+                  push: true
+                  load: true
+                  tags: rohith/order-service:latest
+            - name: Run Trivy vulnerability scanner
+              uses: aquasecurity/trivy-action@0.28.0
+              with:
+                image-ref: order-service:test
+                format: 'sarif'
+                output: 'trivy-results.sarif'
+            - name: Build and push product service images to Docker
+              uses: docker/build-push-action@v6
+              with:
+                  context: ./src/product-service
+                  push: true
+                  load: true
+                  tags: rohith/product-service:latest
+            - name: Run Trivy vulnerability scanner
+              uses: aquasecurity/trivy-action@0.28.0
+              with:
+                image-ref: product-service:test
+                format: 'sarif'
+                output: 'trivy-results.sarif'
+            - name: Build and push store-front service images to Docker
+              uses: docker/build-push-action@v6
+              with:
+                  context: ./src/store-front
+                  push: true
+                  load: true
+                  tags: rohith/store-front-service:latest
+            
+            - name: Run Trivy vulnerability scanner
+              uses: aquasecurity/trivy-action@0.28.0
+              with:
+                image-ref: store-front-service:test
+                format: 'sarif'
+                output: 'trivy-results.sarif'
