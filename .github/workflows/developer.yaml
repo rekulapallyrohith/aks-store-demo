@@ -22,7 +22,7 @@ jobs:
                   context: ./src/order-service
                   push: true
                   load: true
-                  tags: rekulapallyrohith/order-service:latest
+                  tags: rohith/order-service:latest
             - name: Run Trivy vulnerability scanner
               uses: aquasecurity/trivy-action@0.28.0
               with:
@@ -35,7 +35,7 @@ jobs:
                   context: ./src/product-service
                   push: true
                   load: true
-                  tags: rekulapallyrohith/product-service:latest
+                  tags: rohith/product-service:latest
             - name: Run Trivy vulnerability scanner
               uses: aquasecurity/trivy-action@0.28.0
               with:
@@ -48,7 +48,7 @@ jobs:
                   context: ./src/store-front
                   push: true
                   load: true
-                  tags: rekulapallyrohith/store-front-service:latest
+                  tags: rohith/store-front-service:latest
             
             - name: Run Trivy vulnerability scanner
               uses: aquasecurity/trivy-action@0.28.0
