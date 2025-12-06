@@ -1,87 +1,64 @@
-terraform {
-  required_version = ">= 1.9.2"
-  required_providers {
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = ">= 4.0.0, < 5.0.0"
-    }
+resource "azurerm_resource_group" "main" {
+    name = var.resource_group_info.name
+    location = var.resource_group_info.location
+  
+}
 
-    local = {
-      source  = "hashicorp/local"
-      version = "~> 2.5.2"
-    }
+# module "aks" {
+#   source  = "Azure/aks/azurerm"
+#   version = "11.0.0"
+#   # insert the 2 required variables here
+#   resource_group_name   = var.resource_group_info.name
+#   cluster_name          = var.aks_cluster_info.name
+#   location              = var.resource_group_info.location
 
-    random = {
-      source  = "hashicorp/random"
-      version = "~> 3.5"
-    }
+#   agents_count          = var.aks_cluster_info.count
+#   agents_size           = var.aks_cluster_info.size
+#   kubernetes_version    = var.aks_cluster_info.version
+#   network_plugin        = "azure"
+#   os_sku                = "Ubuntu"
+#   sku_tier              = "Standard"
 
-    http = {
-      source  = "hashicorp/http"
-      version = "=3.4.3"
-    }
+#   depends_on = [ azurerm_resource_group.main ]
+
+# }
+
+
+resource "azurerm_kubernetes_cluster" "aks" {
+  name                = var.aks_cluster_info.name
+  location            = var.resource_group_info.location
+  resource_group_name = var.resource_group_info.name
+  dns_prefix          = "exampleaks1"
+
+  default_node_pool {
+    name       = "default"
+    node_count = var.aks_cluster_info.count
+    vm_size    = var.aks_cluster_info.size
   }
-}
 
-provider "azurerm" {
-  resource_provider_registrations = "none"
-
-  features {
-    resource_group {
-      prevent_deletion_if_contains_resources = false
-    }
-
-    cognitive_account {
-      purge_soft_delete_on_destroy = true
-    }
-
-    key_vault {
-      purge_soft_delete_on_destroy = true
-    }
-
-    log_analytics_workspace {
-      permanently_delete_on_destroy = true
-    }
+  identity {
+    type = "SystemAssigned"
   }
-}
 
-resource "random_integer" "example" {
-  min = 10
-  max = 99
-}
-
-resource "random_pet" "example" {
-  length    = 1
-  separator = ""
-  keepers = {
-    location = var.location
+  tags = {
+    Environment = "Production"
   }
+  depends_on = [ azurerm_resource_group.main ]
 }
 
-data "azurerm_subscription" "current" {}
-data "azurerm_client_config" "current" {}
+resource "null_resource" "set_kubeconfig" {
+  depends_on = [azurerm_kubernetes_cluster.aks]
 
-data "http" "current_ip" {
-  url = "https://ipv4.icanhazip.com"
+  provisioner "local-exec" {
+    command = <<EOT
+az aks get-credentials --resource-group ${azurerm_kubernetes_cluster.aks.resource_group_name} \
+    --name ${azurerm_kubernetes_cluster.aks.name} \
+    --overwrite-existing
+EOT
+  }
+
+  triggers = {
+    cluster_id = var.set_kubeconfig
+  }
+  
 }
-
-locals {
-  name                            = "${var.environment}${random_pet.example.id}${random_integer.example.result}"
-  aks_node_pool_vm_size           = var.aks_node_pool_vm_size != "" ? var.aks_node_pool_vm_size : "Standard_D2s_v4"
-  deploy_azure_cosmosdb           = var.deploy_azure_cosmosdb == "true" ? true : false
-  default_cosmosdb_account_kind   = "GlobalDocumentDB"
-  cosmosdb_account_kind           = var.cosmosdb_account_kind != "" ? var.cosmosdb_account_kind : local.default_cosmosdb_account_kind
-  deploy_observability_tools      = var.deploy_observability_tools == "true" ? true : false
-  deploy_azure_container_registry = var.deploy_azure_container_registry == "true" ? true : false
-  deploy_azure_openai             = var.deploy_azure_openai == "true" ? true : false
-  deploy_image_generation_model   = var.deploy_image_generation_model == "true" ? true : false
-  deploy_azure_servicebus         = var.deploy_azure_servicebus == "true" ? true : false
-  source_registry                 = var.source_registry != "" ? var.source_registry : "ghcr.io/azure-samples"
-}
-
-resource "azurerm_resource_group" "example" {
-  name     = "rg-${local.name}"
-  location = var.location
-}
-
-
